@@ -1,8 +1,8 @@
-﻿; VGD2 示意图 —— WPS 加载项安装程序（Inno Setup 7）
-; 由 tools/build-release.mjs 调用：ISCC /DAppVersion=x.y.z /DAddinDir=<release\addin> /DOutputDir=<release> vgd2.iss
+﻿; Epure 示意图 —— WPS 加载项安装程序（Inno Setup 7）
+; 由 tools/build-release.mjs 调用：ISCC /DAppVersion=x.y.z /DAddinDir=<release\addin> /DOutputDir=<release> epure.iss
 ;
 ; 安装内容：
-;   %APPDATA%\kingsoft\wps\jsaddons\vgd2_<版本>\   加载项文件（WPS 本地加载，不需要网址、不需要联网）
+;   %APPDATA%\kingsoft\wps\jsaddons\epure_<版本>\   加载项文件（WPS 本地加载，不需要网址、不需要联网）
 ;   %APPDATA%\kingsoft\wps\jsaddons\publish.xml    登记本地加载项 <jsplugin .../>（合并写入，保留其他加载项）
 ;
 ; 说明：WPS 个人版的加载项列表是 publish.xml——网址加载项为 <jspluginonline>，本地加载项为 <jsplugin>
@@ -19,28 +19,32 @@
   #define OutputDir "..\release"
 #endif
 
-#define AppName "VGD2 示意图"
-#define AddinName "vgd2"
+#define AppName "Epure 示意图"
+#define AddinName "epure"
+; 旧名（VGD2 时期）：升级时清理其目录与登记条目
+#define LegacyName "vgd2"
 
 [Setup]
 AppId={{64EFCE6B-AA4F-401C-A799-36A1D105B40C}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppPublisher=VGD2
+AppPublisher=Epure
 VersionInfoVersion={#AppVersion}
 VersionInfoDescription={#AppName} WPS 加载项安装程序
 DefaultDirName={userappdata}\kingsoft\wps\jsaddons\{#AddinName}_{#AppVersion}
 DisableDirPage=yes
+; 安装目录随名称和版本变化；不沿用旧版（vgd2_*）安装目录，否则同 AppId 升级会装进旧名目录
+UsePreviousAppDir=no
 DisableProgramGroupPage=yes
 DisableReadyPage=yes
 PrivilegesRequired=lowest
-UninstallFilesDir={userappdata}\VGD2\uninstall
+UninstallFilesDir={userappdata}\Epure\uninstall
 UninstallDisplayName={#AppName}（WPS 加载项）
 UninstallDisplayIcon={uninstallexe}
 SetupIconFile=icon.ico
 OutputDir={#OutputDir}
-OutputBaseFilename=VGD2-Setup-{#AppVersion}
+OutputBaseFilename=Epure-Setup-{#AppVersion}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -50,12 +54,14 @@ ShowLanguageDialog=no
 Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
 
 [Messages]
-chinesesimp.WelcomeLabel2=将在 WPS 文字中安装“VGD2 示意图”选项卡，用于绘制数学、物理示意图，插入文档后可再次编辑。%n%n本程序只为当前 Windows 用户安装，不需要联网。
-chinesesimp.FinishedLabel=安装完成。%n%n打开 WPS 文字后，功能区会出现“VGD2 示意图”选项卡。%n%n首次加载时 WPS 可能询问是否信任此加载项，请选择“信任”。
+chinesesimp.WelcomeLabel2=将在 WPS 文字中安装“Epure 示意图”选项卡，用于绘制数学、物理示意图，插入文档后可再次编辑。%n%n本程序只为当前 Windows 用户安装，不需要联网。
+chinesesimp.FinishedLabel=安装完成。%n%n打开 WPS 文字后，功能区会出现“Epure 示意图”选项卡。%n%n首次加载时 WPS 可能询问是否信任此加载项，请选择“信任”。
 
 [InstallDelete]
 ; 升级：删除旧版本目录
 Type: filesandordirs; Name: "{userappdata}\kingsoft\wps\jsaddons\{#AddinName}_*"
+Type: filesandordirs; Name: "{userappdata}\kingsoft\wps\jsaddons\{#LegacyName}_*"
+Type: filesandordirs; Name: "{userappdata}\VGD2"
 
 [Files]
 Source: "{#AddinDir}\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
@@ -67,6 +73,8 @@ Filename: "{code:WpsExe}"; Description: "立即启动 WPS 文字"; Flags: postin
 const
   ENTRY_LOCAL = '<jsplugin name="{#AddinName}"';
   ENTRY_ONLINE = '<jspluginonline name="{#AddinName}"';
+  OLD_LOCAL = '<jsplugin name="{#LegacyName}"';
+  OLD_ONLINE = '<jspluginonline name="{#LegacyName}"';
 
 function PublishXml: String;
 begin
@@ -120,7 +128,7 @@ end;
 { 去掉本加载项的本地与网址（开发版）条目，避免出现两个选项卡 }
 function RemoveEntry(S: String): String;
 begin
-  Result := RemoveTag(RemoveTag(S, ENTRY_LOCAL), ENTRY_ONLINE);
+  Result := RemoveTag(RemoveTag(RemoveTag(RemoveTag(S, ENTRY_LOCAL), ENTRY_ONLINE), OLD_LOCAL), OLD_ONLINE);
 end;
 
 procedure CleanOldJsPlugins;
@@ -129,7 +137,7 @@ var
 begin
   if not FileExists(OldJsPluginsXml) then Exit;
   S := ReadUtf8(OldJsPluginsXml);
-  if Pos(ENTRY_LOCAL, S) > 0 then WriteUtf8(OldJsPluginsXml, RemoveTag(S, ENTRY_LOCAL));
+  if (Pos(ENTRY_LOCAL, S) > 0) or (Pos(OLD_LOCAL, S) > 0) then WriteUtf8(OldJsPluginsXml, RemoveTag(RemoveTag(S, ENTRY_LOCAL), OLD_LOCAL));
 end;
 
 procedure RegisterAddin;
@@ -156,7 +164,7 @@ begin
   CleanOldJsPlugins;
   if not FileExists(PublishXml) then Exit;
   S := ReadUtf8(PublishXml);
-  if Pos(ENTRY_LOCAL, S) > 0 then WriteUtf8(PublishXml, RemoveTag(S, ENTRY_LOCAL));
+  if (Pos(ENTRY_LOCAL, S) > 0) or (Pos(OLD_LOCAL, S) > 0) then WriteUtf8(PublishXml, RemoveTag(RemoveTag(S, ENTRY_LOCAL), OLD_LOCAL));
 end;
 
 function WpsInstallRoot: String;
@@ -197,7 +205,7 @@ var
 begin
   Result := True;
   if WpsInstallRoot = '' then
-    if SuppressibleMsgBox('未检测到 WPS Office。' + #13#10#13#10 + 'VGD2 示意图需要在 WPS 文字中使用。仍要继续安装吗？',
+    if SuppressibleMsgBox('未检测到 WPS Office。' + #13#10#13#10 + 'Epure 示意图需要在 WPS 文字中使用。仍要继续安装吗？',
       mbConfirmation, MB_YESNO, IDYES) = IDNO then
     begin
       Result := False;

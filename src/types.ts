@@ -48,8 +48,8 @@ export interface Layer {
 }
 
 /** 文档（保存文件、嵌入 Word/WPS 图片的数据） */
-export interface VgdDoc {
-  format: 'vgd';
+export interface EpureDoc {
+  format: 'epure';
   version: 2;
   shapes: Shape[];
   /** 插入文档时的原始尺寸（CSS 像素），用于再次编辑时保持缩放比例 */

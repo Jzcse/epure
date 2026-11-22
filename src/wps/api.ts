@@ -12,7 +12,7 @@ type Any = any;
 const PT_PER_PX = 0.75;
 /** 先尝试插入 SVG（矢量），失败再插入 PNG */
 const PREFER_SVG = true;
-export const STORAGE_KEY = 'vgd2_edit';
+export const STORAGE_KEY = 'epure_edit';
 
 export function wpsApp(): Any {
   const w = window as Any;
@@ -38,7 +38,7 @@ function tempDir(app: Any): string {
   return dir.replace(/[\\/]+$/, '');
 }
 
-/** 当前选区中的第一个 VGD 内嵌图片（没有返回 null） */
+/** 当前选区中的第一个 Epure 内嵌图片（没有返回 null） */
 export function selectedDiagramShape(app: Any): Any | null {
   const shapes = app.Selection?.InlineShapes;
   const n = shapes?.Count ?? 0;
@@ -51,7 +51,7 @@ export function selectedDiagramShape(app: Any): Any | null {
 
 function writeImage(app: Any, p: InsertPayload, svg: boolean): string {
   const fs = fileSystem();
-  const path = `${tempDir(app)}\\vgd2_${Date.now()}.${svg ? 'svg' : 'png'}`;
+  const path = `${tempDir(app)}\\epure_${Date.now()}.${svg ? 'svg' : 'png'}`;
   const ok = svg ? fs.writeFileString(path, p.svg) : fs.writeAsBinaryString(path, atob(p.png));
   if (ok === false) throw new Error(`写入临时文件失败：${path}`);
   return path;
@@ -79,7 +79,7 @@ function addPicture(app: Any, p: InsertPayload, range: Any | null): Any {
   throw lastErr instanceof Error ? lastErr : new Error('插入图片失败');
 }
 
-/** 插入新图，或替换当前选中的 VGD 图片（保持用户缩放比例） */
+/** 插入新图，或替换当前选中的 Epure 图片（保持用户缩放比例） */
 export async function insertIntoWps(p: InsertPayload, replace: boolean): Promise<void> {
   const app = wpsApp();
   if (!app.ActiveDocument) throw new Error('没有打开的文档');
@@ -101,5 +101,5 @@ export async function insertIntoWps(p: InsertPayload, replace: boolean): Promise
   shp.Width = p.width * PT_PER_PX * scale;
   shp.Height = p.height * PT_PER_PX * scale;
   shp.AlternativeText = p.data;
-  try { shp.Title = 'VGD2'; } catch { /* 旧版本无 Title 属性 */ }
+  try { shp.Title = 'Epure'; } catch { /* 旧版本无 Title 属性 */ }
 }

@@ -1,12 +1,28 @@
-/** 文档序列化，以及嵌入 Word/WPS 图片“可选文字”的压缩编码 */
-import type { Layer, Shape, VgdDoc } from './types';
+/** 文档序列化，以及嵌入 WPS/Word 图片“可选文字”的压缩编码 */
+import type { EpureDoc, Layer, Shape } from './types';
 import { b64ToBytes, bytesToB64 } from './util';
 
-const PREFIX_Z = 'VGD2z:';
-const PREFIX = 'VGD2:';
+/** 当前写入的标记：EPUREz: = deflate 压缩，EPURE: = 未压缩（不支持压缩流时的回退） */
+const PREFIX_Z = 'EPUREz:';
+const PREFIX = 'EPURE:';
 
-export function makeDoc(shapes: Shape[], size?: VgdDoc['size'], layers?: Layer[]): VgdDoc {
-  const doc: VgdDoc = { format: 'vgd', version: 2, shapes };
+/**
+ * 旧名 VGD2 时期写入的标记。已插入文档的旧图、已保存的旧文件要继续可读，
+ * 因此只读不写。不要删除。
+ */
+const LEGACY: { prefix: string; compressed: boolean }[] = [
+  { prefix: 'VGD2z:', compressed: true },
+  { prefix: 'VGD2:', compressed: false },
+];
+
+const READABLE: { prefix: string; compressed: boolean }[] = [
+  { prefix: PREFIX_Z, compressed: true },
+  { prefix: PREFIX, compressed: false },
+  ...LEGACY,
+];
+
+export function makeDoc(shapes: Shape[], size?: EpureDoc['size'], layers?: Layer[]): EpureDoc {
+  const doc: EpureDoc = { format: 'epure', version: 2, shapes };
   if (size) doc.size = size;
   if (layers) doc.layers = layers;
   return doc;
@@ -25,14 +41,18 @@ function validLayers(v: unknown): Layer[] | undefined {
   return out.length ? out : undefined;
 }
 
-/** 校验并规范化任意来源的文档对象（兼容 version 1） */
-export function parseDoc(obj: unknown): VgdDoc {
-  if (!obj || typeof obj !== 'object' || (obj as { format?: unknown }).format !== 'vgd') {
-    throw new Error('不是有效的 VGD 文件');
+/**
+ * 校验并规范化任意来源的文档对象。
+ * 兼容：format 为旧名 'vgd' 的文件；没有 layers 字段的旧文件（打开后归入默认图层）。
+ */
+export function parseDoc(obj: unknown): EpureDoc {
+  const format = (obj as { format?: unknown } | null)?.format;
+  if (!obj || typeof obj !== 'object' || (format !== 'epure' && format !== 'vgd')) {
+    throw new Error('不是有效的 Epure 文件');
   }
   const shapes = (obj as { shapes?: unknown }).shapes;
   if (!Array.isArray(shapes)) throw new Error('文件中缺少图形数据');
-  const size = (obj as { size?: VgdDoc['size'] }).size;
+  const size = (obj as { size?: EpureDoc['size'] }).size;
   return makeDoc(
     shapes as Shape[],
     size && typeof size.w === 'number' && typeof size.h === 'number' ? size : undefined,
@@ -46,7 +66,7 @@ async function pipe(bytes: Uint8Array, stream: CompressionStream | Decompression
 }
 
 /** 文档 → 可存入图片可选文字的字符串（deflate + base64） */
-export async function encodeDoc(doc: VgdDoc): Promise<string> {
+export async function encodeDoc(doc: EpureDoc): Promise<string> {
   const raw = new TextEncoder().encode(JSON.stringify(doc));
   if (typeof CompressionStream !== 'undefined') {
     try {
@@ -58,24 +78,21 @@ export async function encodeDoc(doc: VgdDoc): Promise<string> {
   return PREFIX + bytesToB64(raw);
 }
 
+/** 可选文字里是否含有本程序（含旧名 VGD2）写入的源数据 */
 export function isEncodedDoc(str: string | null | undefined): boolean {
-  return !!str && (str.includes(PREFIX_Z) || str.includes(PREFIX));
+  return !!str && READABLE.some((r) => str.includes(r.prefix));
 }
 
-/** 解码可选文字；不含 VGD 数据时返回 null */
-export async function decodeDoc(str: string | null | undefined): Promise<VgdDoc | null> {
+/** 解码可选文字；不含 Epure 数据时返回 null。可读取旧名 VGD2 写入的数据 */
+export async function decodeDoc(str: string | null | undefined): Promise<EpureDoc | null> {
   if (!str) return null;
   const s = String(str).trim();
-  let i = s.indexOf(PREFIX_Z);
-  if (i >= 0) {
-    const bytes = b64ToBytes(s.slice(i + PREFIX_Z.length).replace(/\s+/g, ''));
-    const json = new TextDecoder().decode(await pipe(bytes, new DecompressionStream('deflate-raw')));
+  for (const { prefix, compressed } of READABLE) {
+    const i = s.indexOf(prefix);
+    if (i < 0) continue;
+    const bytes = b64ToBytes(s.slice(i + prefix.length).replace(/\s+/g, ''));
+    const json = new TextDecoder().decode(compressed ? await pipe(bytes, new DecompressionStream('deflate-raw')) : bytes);
     return parseDoc(JSON.parse(json));
-  }
-  i = s.indexOf(PREFIX);
-  if (i >= 0) {
-    const bytes = b64ToBytes(s.slice(i + PREFIX.length).replace(/\s+/g, ''));
-    return parseDoc(JSON.parse(new TextDecoder().decode(bytes)));
   }
   return null;
 }

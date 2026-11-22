@@ -56,3 +56,17 @@ const descr = xdoc.getElementsByTagNameNS('http://schemas.openxmlformats.org/dra
 const descrOk = !!descr && JSON.stringify((await decodeDoc(descr))?.shapes) === JSON.stringify(shapes);
 log(`ooxml: ${xerr ? 'XML ERROR ' + xerr.textContent : 'xml ok'}; parts=${parts.join(',')}; descr roundtrip ${descrOk ? 'OK' : 'FAIL'}`);
 if (xerr || !descrOk) document.title = 'SMOKE-FAIL';
+
+// 旧名 VGD2 兼容：旧版写入的标记和 format 仍可读取；新版写入新标记
+{
+  const { bytesToB64 } = await import('../src/util');
+  const { isEncodedDoc } = await import('../src/doc');
+  const raw = new TextEncoder().encode(JSON.stringify({ format: 'vgd', version: 2, shapes }));
+  const z = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+  const legacyZ = 'VGD2z:' + bytesToB64(z);
+  const legacyRaw = 'VGD2:' + bytesToB64(raw);
+  const same = (d: Awaited<ReturnType<typeof decodeDoc>>) => !!d && JSON.stringify(d.shapes) === JSON.stringify(shapes) && d.format === 'epure';
+  const okLegacy = isEncodedDoc(legacyZ) && same(await decodeDoc(legacyZ)) && same(await decodeDoc(legacyRaw)) && p.data.startsWith('EPUREz:');
+  log(`legacy VGD2 compat: ${okLegacy ? 'OK' : 'FAIL'}`);
+  if (!okLegacy) document.title = 'SMOKE-FAIL';
+}

@@ -12,14 +12,14 @@ export type Msg =
 
 const CHUNK = 30000;
 
-interface Chunk { __vgd: 1; id: string; i: number; n: number; d: string }
+interface Chunk { __epure: 1; id: string; i: number; n: number; d: string }
 
 export function sendChunked(send: (s: string) => void, msg: Msg): void {
   const text = JSON.stringify(msg);
   const id = Math.random().toString(36).slice(2);
   const n = Math.max(1, Math.ceil(text.length / CHUNK));
   for (let i = 0; i < n; i++) {
-    const c: Chunk = { __vgd: 1, id, i, n, d: text.slice(i * CHUNK, (i + 1) * CHUNK) };
+    const c: Chunk = { __epure: 1, id, i, n, d: text.slice(i * CHUNK, (i + 1) * CHUNK) };
     send(JSON.stringify(c));
   }
 }
@@ -36,7 +36,7 @@ export class ChunkReceiver {
     } catch {
       return;
     }
-    if (!c || c.__vgd !== 1) return;
+    if (!c || c.__epure !== 1) return;
     const arr = this.parts.get(c.id) ?? new Array<string>(c.n);
     arr[c.i] = c.d;
     this.parts.set(c.id, arr);

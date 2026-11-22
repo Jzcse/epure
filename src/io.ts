@@ -1,5 +1,5 @@
 /** 文件读写、SVG/PNG 导出，以及插入 Word/WPS 所需的数据包 */
-import type { Layer, Shape, VgdDoc } from './types';
+import type { EpureDoc, Layer, Shape } from './types';
 import { boundsOf } from './geometry';
 import { documentMarkup, shapeBleed } from './shapes';
 import { encodeDoc, makeDoc, parseDoc } from './doc';
@@ -59,10 +59,10 @@ export async function rasterize(svg: SvgOut, scale: number, background: string |
 
 export function saveDocument(shapes: Shape[], layers?: Layer[]): void {
   const data = JSON.stringify(makeDoc(shapes, undefined, layers), null, 2);
-  downloadBlob(new Blob([data], { type: 'application/json' }), 'diagram.vgd.json');
+  downloadBlob(new Blob([data], { type: 'application/json' }), 'diagram.epure.json');
 }
 
-export async function readDocument(file: File): Promise<VgdDoc> {
+export async function readDocument(file: File): Promise<EpureDoc> {
   return parseDoc(JSON.parse(await file.text()));
 }
 
@@ -83,7 +83,7 @@ export interface InsertPayload {
   /** 图形逻辑尺寸（CSS 像素，96 DPI） */
   width: number;
   height: number;
-  /** 存入图片可选文字的源数据（VGD2z:...） */
+  /** 存入图片可选文字的源数据（EPUREz:...） */
   data: string;
 }
 

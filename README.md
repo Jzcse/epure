@@ -4,7 +4,17 @@
 
 Epure 是一个轻量级矢量示意图编辑器，面向学生和教师在 WPS 文字里绘制数学、物理示意图（定位上是 AxGlyph 的免费平替）。编辑器用网页技术实现，作为 WPS 加载项运行：在文档里点“插入示意图”打开编辑器，画完插入；以后选中这张图，点“编辑示意图”可以继续修改。
 
-> **命名说明**：项目已定名 Epure。代码、数据格式和安装包内部仍使用旧名 `VGD2`（文件扩展名 `.vgd.json`、数据标记 `VGD2z:`、安装包 `VGD2-Setup-*.exe`、WPS 目录 `vgd2_<版本>`）。这是为了让旧版本已插入文档的图、已保存的文件继续可用，统一改名在计划中，会保留对旧标记的识别。
+## 下载安装
+
+到 [Releases](https://github.com/Jzcse/epure/releases) 下载 `Epure-Setup-<版本>.exe`，双击安装即可：
+
+- 仅支持 Windows 上的 **WPS Office**（在 WPS 12.1 个人版上开发和测试）。
+- 按当前用户安装，不需要管理员权限，不需要联网。
+- 安装包没有代码签名，Windows 可能提示“未知发布者”，点“更多信息 → 仍要运行”。
+- 安装后重启 WPS，新建或打开一个文字文档，功能区出现“Epure 示意图”选项卡。WPS 首次加载时可能询问是否信任此加载项，选“信任”。
+- 卸载：“设置 → 应用”中找到“Epure 示意图”。
+
+> **改名说明**：项目原名 VGD2，已统一改名为 Epure。为保证兼容，新版仍能读取旧版保存的 `.vgd.json` 文件和旧版插入文档的示意图（可选文字里的 `VGD2z:` 标记），直接选中旧图点“编辑示意图”即可；再次保存或插入时会写成新格式。安装新版会自动清理旧版（VGD2）的安装目录与登记，不会出现两个选项卡。
 
 ## 当前状态
 
@@ -12,7 +22,7 @@ Epure 是一个轻量级矢量示意图编辑器，面向学生和教师在 WPS 
 |---|---|
 | 独立网页版编辑器 | ✅ 可用，交互测试 35 项全部通过 |
 | WPS 加载项（开发方式：本地网址） | ✅ 已在 WPS 12.1 中验证：插入、再编辑、弹窗尺寸 |
-| WPS 安装包（本地文件加载，不需要网址） | ⚠️ 安装、卸载、登记已验证；**WPS 实际加载本地加载项尚在验证中** |
+| WPS 安装包（本地文件加载，不需要网址） | ⚠️ 安装、升级、卸载、登记已验证；**WPS 实际加载本地加载项尚在验证中**，发布为 pre-release |
 | Word 加载项 | ⏸ 暂停。代码保留在仓库中，发行版不包含，不再维护 |
 
 ## 功能
@@ -24,7 +34,7 @@ Epure 是一个轻量级矢量示意图编辑器，面向学生和教师在 WPS 
 - **骨架与吸附**：线段端点/中点，矩形角点/边中点/中心，椭圆中心/象限点，多边形顶点/边中点。绘制、拖动线段端点、移动对象时自动吸附，被吸附的关键点高亮显示；选中对象时显示其全部关键点；按住 Alt 临时关闭吸附。
 - **图层**：新建、删除、重命名、显示/隐藏、锁定、上移/下移、把选中对象移到当前图层。隐藏图层不导出、不插入文档，但随文档保存，再次编辑时完整恢复。
 - **无限画布**：右键（或中键）拖动平移，滚轮缩放，Ctrl+0 显示全部；插入和导出按图形实际范围自动裁剪。
-- **文件**：本地保存/打开（`.vgd.json`），导出 SVG 和 PNG。
+- **文件**：本地保存/打开（`.epure.json`，也能打开旧版 `.vgd.json`），导出 SVG 和 PNG。
 - **界面**：画布、图标化操作栏、分类对象栏（示意图图块，悬停显示名称和说明）、右侧“属性/图层”选项卡（未选中对象时属性卡不可用）。
 
 ### 快捷键
@@ -49,7 +59,7 @@ pnpm register       # 写入 %APPDATA%\kingsoft\wps\jsaddons\publish.xml（网�
 pnpm unregister     # 注销
 ```
 
-保持 `pnpm start` 运行，重启 WPS，功能区会出现“VGD2 示意图”选项卡。首次加载时 WPS 会询问是否信任，选“信任”。
+保持 `pnpm start` 运行，重启 WPS，功能区会出现“Epure 示意图”选项卡。首次加载时 WPS 会询问是否信任，选“信任”。
 
 ### 测试
 
@@ -65,11 +75,11 @@ node tests/e2e.mjs https://localhost:3000/index.html   # 交互测试，Edge 无
 ## 发行版（WPS 安装包）
 
 ```bash
-pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VGD2-Setup-<版本>.exe
+pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/Epure-Setup-<版本>.exe
 ```
 
 - 版本号取自 `package.json` 的 `version`。Inno Setup 默认路径 `D:\Application\Builder\Inno Setup 7\ISCC.exe`，可用环境变量 `ISCC` 指定。
-- 安装包按当前用户安装（不需要管理员权限）：加载项文件放到 `%APPDATA%\kingsoft\wps\jsaddons\vgd2_<版本>\`，并在同目录 `publish.xml` 中登记 `<jsplugin>` 条目（合并写入，保留其他加载项；也会清理开发方式留下的条目，避免出现两个选项卡）。
+- 安装包按当前用户安装（不需要管理员权限）：加载项文件放到 `%APPDATA%\kingsoft\wps\jsaddons\epure_<版本>\`，并在同目录 `publish.xml` 中登记 `<jsplugin>` 条目（合并写入，保留其他加载项；也会清理开发方式和旧名 vgd2 留下的条目，避免出现两个选项卡）。
 - 发行版只含 WPS 相关代码（构建常量 `__WPS_ONLY__`）；脚本打包为经典脚本（非 ES 模块），可从本地文件直接运行，不依赖任何服务器；功能区只有“插入示意图”“编辑示意图”两个按钮，没有 JS 调试器。
 - `publish.xml` 里的 `url="http://127.0.0.1/..."` 只是格式要求的占位字段，没有任何服务监听这个地址。
 - 图标：`installer/icon.ico`，由 `node tools/make-icon.mjs` 从 `public/assets/icon.svg` 生成。
@@ -77,7 +87,7 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 
 ## 工作原理
 
-- **插入**：编辑器生成 SVG（带 PNG 回退），并把完整源数据（JSON → deflate → base64，前缀 `VGD2z:`）写入图片的“可选文字（Alt Text）”。WPS 端先把图片写到临时文件，再用 `InlineShapes.AddPicture` 插入，优先 SVG，失败回退 PNG。
+- **插入**：编辑器生成 SVG（带 PNG 回退），并把完整源数据（JSON → deflate → base64，前缀 `EPUREz:`）写入图片的“可选文字（Alt Text）”。WPS 端先把图片写到临时文件，再用 `InlineShapes.AddPicture` 插入，优先 SVG，失败回退 PNG。
 - **再编辑**：读取选中图片的可选文字 → 解码 → 在编辑器中打开 → 原位替换，并保留你在文档里调整过的缩放比例。
 - **隐藏图层**：只存在于可选文字里的源数据中，不进入图片。
 - **弹窗尺寸**：WPS 加载项主页面在后台隐藏运行，`screen.*` 恒为 1×1、`devicePixelRatio` 恒为 1，不可用。因此按 WPS 主窗口尺寸（`Application.Width/Height`，单位磅）计算，且不小于编辑器最小尺寸 1100×680。
@@ -89,7 +99,7 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 ├─ index.html               编辑器页面（开发：独立 / ?host=wps / ?host=office）
 ├─ src/
 │  ├─ main.ts               入口：识别宿主、绑定界面、载入待编辑数据
-│  ├─ types.ts              数据模型（Shape、Layer、VgdDoc）
+│  ├─ types.ts              数据模型（Shape、Layer、EpureDoc）
 │  ├─ editor.ts             交互状态机：工具、选择、拖动、图层、无限画布、快捷键
 │  ├─ tools.ts              绘图工具注册表（对象栏由此生成；新增对象在这里登记）
 │  ├─ snap.ts               对象骨架（关键点）与吸附计算
@@ -112,7 +122,7 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 │  └─ wps/                  ribbon.xml（WPS 功能区）与按钮图标
 ├─ wps/index.html           WPS 加载项主页（开发方式）
 ├─ office/                  Word 加载项清单与任务窗格页面（暂停维护）
-├─ installer/               Inno Setup 脚本（vgd2.iss）与安装程序图标
+├─ installer/               Inno Setup 脚本（epure.iss）与安装程序图标
 ├─ tools/
 │  ├─ build-release.mjs     构建发行版并打包安装程序
 │  ├─ register.mjs          注册/注销开发用加载项
@@ -127,11 +137,11 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 
 ## 数据格式
 
-文档为 JSON（`.vgd.json`，也是写入图片可选文字的内容）：
+文档为 JSON（`.epure.json`，也是写入图片可选文字的内容）：
 
 ```jsonc
 {
-  "format": "vgd",
+  "format": "epure",
   "version": 2,
   "shapes": [ { "id": "…", "kind": "line|rect|ellipse|path|text", "layer": "L1", "x": 0, "y": 0, "w": 0, "h": 0, "rot": 0, "…": "样式与点集" } ],
   "layers": [ { "id": "L1", "name": "图层 1", "visible": true, "locked": false } ],  // 下标 0 在最底层
@@ -139,7 +149,9 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 }
 ```
 
-旧版本保存的文件没有 `layers` 字段，打开后全部归入默认图层。
+向后兼容（`src/doc.ts`，不要删除）：
+- `format` 为 `"vgd"` 的旧文件、可选文字里 `VGD2z:` / `VGD2:` 开头的旧标记仍可读取；新写入一律用 `epure` 和 `EPUREz:` / `EPURE:`。
+- 没有 `layers` 字段的更旧文件，打开后全部归入默认图层。
 
 ## 已知限制
 
@@ -152,6 +164,5 @@ pnpm release        # 构建 release/addin，并用 Inno Setup 生成 release/VG
 ## 路线图
 
 1. 在真实 WPS 中确认安装包的本地加载；必要时调整加载项登记方式。
-2. 统一改名为 Epure（保留对旧数据标记 `VGD2z:` 与 `.vgd.json` 的识别）。
-3. 组合、对齐参考线、对齐与分布。
-4. 学科元件库：坐标轴、力学（斜面、弹簧、滑轮、小车）、电路元件、几何标注（角度、尺寸）。
+2. 组合、对齐参考线、对齐与分布。
+3. 学科元件库：坐标轴、力学（斜面、弹簧、滑轮、小车）、电路元件、几何标注（角度、尺寸）。

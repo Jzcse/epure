@@ -9,8 +9,8 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../host/size';
 type Any = any;
 
 const ICONS: Record<string, string> = {
-  vgdNew: 'images/new.svg',
-  vgdEdit: 'images/edit.svg',
+  epureNew: 'images/new.svg',
+  epureEdit: 'images/edit.svg',
 };
 
 /** 窗口标题栏、边框所占的余量（CSS 像素） */
@@ -52,7 +52,7 @@ function openEditor(edit: boolean): void {
   if (edit) {
     const shp = selectedDiagramShape(app);
     if (!shp) {
-      alert('请先单击选中一个由 VGD2 插入的示意图');
+      alert('请先单击选中一个由 Epure 插入的示意图');
       return;
     }
     data = shp.AlternativeText;
@@ -60,7 +60,7 @@ function openEditor(edit: boolean): void {
   app.PluginStorage.setItem(STORAGE_KEY, data);
   const { w, h } = dialogSize(app);
   const url = new URL(`${__EDITOR_URL__}?host=wps&rw=${w}&rh=${h}`, location.href).href;
-  app.ShowDialog(url, edit ? 'VGD2 示意图 - 编辑' : 'VGD2 示意图 - 新建', w, h, true);
+  app.ShowDialog(url, edit ? 'Epure 示意图 - 编辑' : 'Epure 示意图 - 新建', w, h, true);
 }
 
 (window as Any).ribbon = {
@@ -71,10 +71,10 @@ function openEditor(edit: boolean): void {
   },
   OnAction(control: Any): boolean {
     try {
-      if (control.Id === 'vgdNew') openEditor(false);
-      else if (control.Id === 'vgdEdit') openEditor(true);
+      if (control.Id === 'epureNew') openEditor(false);
+      else if (control.Id === 'epureEdit') openEditor(true);
     } catch (err) {
-      alert(`VGD2 出错：${err instanceof Error ? err.message : String(err)}`);
+      alert(`Epure 出错：${err instanceof Error ? err.message : String(err)}`);
     }
     return true;
   },

@@ -2,10 +2,10 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="ribbon.OnAddinLoad">
   <ribbon startFromScratch="false">
     <tabs>
-      <tab id="vgd2Tab" label="VGD2 示意图">
-        <group id="vgd2Group" label="示意图">
-          <button id="vgdNew" label="插入示意图" size="large" onAction="ribbon.OnAction" getImage="ribbon.GetImage" screentip="打开编辑器绘制新的数学/物理示意图"/>
-          <button id="vgdEdit" label="编辑示意图" size="large" onAction="ribbon.OnAction" getImage="ribbon.GetImage" screentip="编辑当前选中的 VGD2 示意图"/>
+      <tab id="epureTab" label="Epure 示意图">
+        <group id="epureGroup" label="示意图">
+          <button id="epureNew" label="插入示意图" size="large" onAction="ribbon.OnAction" getImage="ribbon.GetImage" screentip="打开编辑器绘制新的数学/物理示意图"/>
+          <button id="epureEdit" label="编辑示意图" size="large" onAction="ribbon.OnAction" getImage="ribbon.GetImage" screentip="编辑当前选中的 Epure 示意图"/>
         </group>
       </tab>
     </tabs>

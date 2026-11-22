@@ -4,7 +4,7 @@
  *   node tools/build-release.mjs          构建 release/addin 并调用 Inno Setup 生成安装包
  *   node tools/build-release.mjs --no-installer   只构建加载项文件
  *
- * 发行版目录结构（安装到 %APPDATA%\kingsoft\wps\jsaddons\vgd2_<版本>\，由 WPS 本地加载，不需要任何网址）：
+ * 发行版目录结构（安装到 %APPDATA%\kingsoft\wps\jsaddons\epure_<版本>\，由 WPS 本地加载，不需要任何网址）：
  *   index.html     WPS 加载项主页面（隐藏运行，提供功能区回调）
  *   ribbon.xml     功能区：插入示意图 / 编辑示意图
  *   editor.html    编辑器（ShowDialog 打开）
@@ -51,14 +51,14 @@ async function bundle(entry, name, fileName, emptyOutDir) {
   });
 }
 
-console.log(`构建 VGD2 ${version}（WPS 发行版）…`);
+console.log(`构建 Epure ${version}（WPS 发行版）…`);
 rmSync(out, { recursive: true, force: true });
 mkdirSync(assets, { recursive: true });
 
-await bundle('src/main.ts', 'VGD2Editor', 'editor.js', false);
+await bundle('src/main.ts', 'EpureEditor', 'editor.js', false);
 // Vite 5 库模式把导入的 CSS 输出为 style.css
 if (existsSync(join(assets, 'style.css'))) renameSync(join(assets, 'style.css'), join(assets, 'editor.css'));
-await bundle('src/wps/main.ts', 'VGD2Wps', 'wps.js', false);
+await bundle('src/wps/main.ts', 'EpureWps', 'wps.js', false);
 
 // editor.html：由开发版 index.html 生成，换成经典脚本 + 独立样式表
 let editorHtml = readFileSync(join(root, 'index.html'), 'utf8');
@@ -73,7 +73,7 @@ writeFileSync(join(out, 'index.html'), `<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>VGD2 示意图 ${version}</title>
+  <title>Epure 示意图 ${version}</title>
 </head>
 <body>
   <script src="assets/wps.js"></script>
@@ -102,6 +102,6 @@ execFileSync(ISCC, [
   `/DAppVersion=${version}`,
   `/DAddinDir=${out}`,
   `/DOutputDir=${releaseDir}`,
-  join(root, 'installer', 'vgd2.iss'),
+  join(root, 'installer', 'epure.iss'),
 ], { stdio: 'inherit' });
-console.log(`安装包：${join(releaseDir, `VGD2-Setup-${version}.exe`)}`);
+console.log(`安装包：${join(releaseDir, `Epure-Setup-${version}.exe`)}`);

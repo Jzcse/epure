@@ -13,7 +13,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const SIZES = [16, 24, 32, 48, 64, 128, 256];
 const svg = readFileSync(join(root, 'public/assets/icon.svg'), 'utf8');
-const tmp = mkdtempSync(join(tmpdir(), 'vgd2-icon-'));
+const tmp = mkdtempSync(join(tmpdir(), 'epure-icon-'));
 
 const pngs = SIZES.map((s) => {
   const html = join(tmp, `i${s}.html`);

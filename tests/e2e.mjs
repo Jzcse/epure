@@ -15,7 +15,7 @@ const H = 800;
 
 const edge = spawn(EDGE, [
   '--headless=new', '--disable-gpu', `--remote-debugging-port=${PORT}`, `--window-size=${W},${H}`,
-  `--user-data-dir=${join(tmpdir(), 'vgd2-e2e-profile')}`, 'about:blank',
+  `--user-data-dir=${join(tmpdir(), 'epure-e2e-profile')}`, 'about:blank',
 ], { stdio: 'ignore' });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

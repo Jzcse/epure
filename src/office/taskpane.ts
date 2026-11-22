@@ -84,7 +84,7 @@ async function editSelected(): Promise<void> {
   try {
     const target = await findSelectedDiagram();
     if (!target) {
-      setStatus('请先在文档中单击选中一个由 VGD2 插入的示意图', true);
+      setStatus('请先在文档中单击选中一个由 Epure 插入的示意图', true);
       return;
     }
     openEditor(target);

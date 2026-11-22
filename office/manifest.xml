@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  VGD2 Word 加载项清单（开发版，指向 https://localhost:3000）。
+  Epure Word 加载项清单（开发版，指向 https://localhost:3000）。
   部署到正式服务器时，把所有 https://localhost:3000 替换为实际地址即可。
 -->
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
@@ -10,9 +10,9 @@
            xsi:type="TaskPaneApp">
   <Id>ad2a4211-70bb-4fb4-a7cc-b6c6fe2480b2</Id>
   <Version>0.2.0.0</Version>
-  <ProviderName>VGD2</ProviderName>
+  <ProviderName>Epure</ProviderName>
   <DefaultLocale>zh-CN</DefaultLocale>
-  <DisplayName DefaultValue="VGD2 示意图"/>
+  <DisplayName DefaultValue="Epure 示意图"/>
   <Description DefaultValue="轻量级数学/物理矢量示意图编辑器，插入后可再次编辑。"/>
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
@@ -45,15 +45,15 @@
           </GetStarted>
           <FunctionFile resid="Taskpane.Url"/>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
-            <CustomTab id="VGD2.Tab">
-              <Group id="VGD2.Group">
+            <CustomTab id="Epure.Tab">
+              <Group id="Epure.Group">
                 <Label resid="Group.Label"/>
                 <Icon>
                   <bt:Image size="16" resid="Icon.16"/>
                   <bt:Image size="32" resid="Icon.32"/>
                   <bt:Image size="80" resid="Icon.80"/>
                 </Icon>
-                <Control xsi:type="Button" id="VGD2.Open">
+                <Control xsi:type="Button" id="Epure.Open">
                   <Label resid="Open.Label"/>
                   <Supertip>
                     <Title resid="Open.Label"/>
@@ -65,7 +65,7 @@
                     <bt:Image size="80" resid="Icon.80"/>
                   </Icon>
                   <Action xsi:type="ShowTaskpane">
-                    <TaskpaneId>VGD2.Pane</TaskpaneId>
+                    <TaskpaneId>Epure.Pane</TaskpaneId>
                     <SourceLocation resid="Taskpane.Url"/>
                   </Action>
                 </Control>
@@ -86,14 +86,14 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/office/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="Tab.Label" DefaultValue="VGD2 示意图"/>
+        <bt:String id="Tab.Label" DefaultValue="Epure 示意图"/>
         <bt:String id="Group.Label" DefaultValue="示意图"/>
         <bt:String id="Open.Label" DefaultValue="示意图编辑器"/>
-        <bt:String id="GetStarted.Title" DefaultValue="VGD2 示意图已加载"/>
+        <bt:String id="GetStarted.Title" DefaultValue="Epure 示意图已加载"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="Open.Tip" DefaultValue="打开 VGD2 面板，插入新示意图或编辑选中的示意图。"/>
-        <bt:String id="GetStarted.Desc" DefaultValue="在“VGD2 示意图”选项卡中打开编辑器。"/>
+        <bt:String id="Open.Tip" DefaultValue="打开 Epure 面板，插入新示意图或编辑选中的示意图。"/>
+        <bt:String id="GetStarted.Desc" DefaultValue="在“Epure 示意图”选项卡中打开编辑器。"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

@@ -4,7 +4,7 @@ import type { InsertPayload } from '../io';
 export { MIN_HEIGHT, MIN_WIDTH } from './size';
 
 export interface InitResult {
-  /** 要编辑的源数据（VGD2z:...），新建时为 null */
+  /** 要编辑的源数据（EPUREz:...），新建时为 null */
   data: string | null;
   /** 需要提示给用户的信息 */
   notice?: string;

@@ -20,7 +20,7 @@ export class PaintCtx {
   private readonly used = new Map<string, string>();
 
   paint(kind: FillType, color: string): string {
-    const id = `vgdp-${kind}-${color.replace(/[^0-9a-zA-Z]/g, '')}`;
+    const id = `epure-${kind}-${color.replace(/[^0-9a-zA-Z]/g, '')}`;
     if (!this.used.has(id)) {
       const c = esc(color);
       const pat = (body: string, w = 6, h = 6, tr = '') =>
