@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VGD2 · 矢量示意图编辑器</title>
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div id="stage" class="stage">
+        <svg id="canvas" xmlns="http://www.w3.org/2000/svg" data-tool="select">
+          <g id="viewport">
+            <g id="content"></g>
+            <g id="overlay"></g>
+            <g id="snap"></g>
+          </g>
+        </svg>
+        <textarea id="text-edit" class="text-edit" spellcheck="false"></textarea>
+        <div class="zoombox">
+          <button id="zoom-out" class="ibtn" data-tip="缩小 (滚轮 / Ctrl+-)"></button>
+          <span id="zoom" data-tip="滚轮缩放，右键拖动画布">100%</span>
+          <button id="zoom-in" class="ibtn" data-tip="放大 (滚轮 / Ctrl+=)"></button>
+          <button id="zoom-fit" class="ibtn" data-tip="显示全部图形 (Ctrl+0)"></button>
+        </div>
+      </div>
+
+      <!-- 操作栏（由 ui.ts 生成） -->
+      <div id="actionbar" class="actionbar"></div>
+
+      <!-- 对象栏 -->
+      <div class="palette">
+        <div id="palette-tabs" class="tabs"></div>
+        <div class="palette-body">
+          <div id="palette-tiles" class="tiles"></div>
+          <div id="palette-pinned" class="tiles pinned"></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel">
+      <div id="host-group" class="host-bar" hidden>
+        <button id="host-insert" class="primary">插入到文档</button>
+        <button id="host-cancel">取消</button>
+      </div>
+
+      <div class="ptabs">
+        <button id="tab-props" class="ptab" data-pane="props">属性</button>
+        <button id="tab-layers" class="ptab" data-pane="layers">图层</button>
+      </div>
+
+      <div id="pane-props" class="pane">
+      <div class="panel-head">
+        <span id="sel-info" class="sel-info"></span>
+      </div>
+
+      <section id="style-section">
+        <h3>线条</h3>
+        <label>颜色 <input id="stroke" type="color" value="#000000" /></label>
+        <label>线宽 <input id="sw" type="number" min="0" max="40" step="0.5" value="1.5" /></label>
+        <label>线型 <select id="dash"></select></label>
+        <label>起点 <select id="arrow-start"></select></label>
+        <label>终点 <select id="arrow-end"></select></label>
+        <label>箭头大小 <input id="arrow-size" type="number" min="0.3" max="4" step="0.1" value="1" /></label>
+      </section>
+
+      <section id="fill-section">
+        <h3>填充</h3>
+        <label>方式 <select id="fill-type"></select></label>
+        <label>颜色 <input id="fill" type="color" value="#ffffff" /></label>
+      </section>
+
+      <section id="text-section">
+        <h3>文字</h3>
+        <label>字体
+          <select id="font">
+            <option>Times New Roman</option>
+            <option>Cambria Math</option>
+            <option>Arial</option>
+            <option>Calibri</option>
+            <option>SimSun</option>
+            <option>SimHei</option>
+            <option>KaiTi</option>
+            <option>Microsoft YaHei</option>
+          </select>
+        </label>
+        <label>字号 <input id="fsize" type="number" min="4" max="200" value="20" /></label>
+        <label>颜色 <input id="tcolor" type="color" value="#000000" /></label>
+        <div class="toggles">
+          <button id="bold" class="ibtn toggle" data-tip="粗体"></button>
+          <button id="italic" class="ibtn toggle" data-tip="斜体"></button>
+          <button id="math" class="ibtn toggle" data-tip="公式模式&#10;x^2 上标  v_0 下标  \alpha 希腊字母  \vec{F} 矢量"></button>
+        </div>
+      </section>
+
+      <section id="arrange-section">
+        <h3>变换</h3>
+        <label>旋转 <input id="rot" type="number" step="1" value="0" /></label>
+        <label>不透明度 <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" /></label>
+      </section>
+      </div>
+
+      <div id="pane-layers" class="pane" hidden>
+        <div id="layer-tools" class="layer-tools"></div>
+        <ul id="layer-list" class="layer-list"></ul>
+        <p class="layer-hint">单击设为当前图层（新对象画在当前图层）· 双击重命名</p>
+      </div>
+    </aside>
+  </div>
+
+  <div id="tooltip" class="tooltip" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+  <input id="file" type="file" accept=".json,application/json" hidden />
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

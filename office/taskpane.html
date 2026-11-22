@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VGD2 示意图</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    body { font: 14px "Microsoft YaHei", "Segoe UI", sans-serif; margin: 0; padding: 16px; color: #1f2937; }
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    p.sub { color: #6b7280; margin: 0 0 16px; font-size: 12px; }
+    button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; font-size: 14px; border-radius: 6px;
+      border: 1px solid #2563eb; background: #2563eb; color: #fff; cursor: pointer; }
+    button.secondary { background: #fff; color: #2563eb; }
+    button:disabled { opacity: .5; cursor: default; }
+    #status { margin-top: 8px; font-size: 12px; color: #374151; min-height: 1.5em; }
+    #status.error { color: #b91c1c; }
+    ul { padding-left: 18px; color: #4b5563; font-size: 12px; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <h1>VGD2 示意图</h1>
+  <p class="sub">数学 / 物理示意图编辑器</p>
+  <button id="btn-new" disabled>插入新示意图</button>
+  <button id="btn-edit" class="secondary" disabled>编辑选中的示意图</button>
+  <div id="status">正在加载…</div>
+  <ul>
+    <li>插入的图片为矢量格式，缩放不失真。</li>
+    <li>单击选中已插入的示意图，再点“编辑选中的示意图”即可继续修改。</li>
+    <li>修改后会保留你在 Word 中调整过的图片大小比例。</li>
+  </ul>
+  <script type="module" src="/src/office/taskpane.ts"></script>
+</body>
+</html>
