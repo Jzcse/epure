@@ -18,8 +18,6 @@ const manifest = join(root, 'office', 'manifest.xml');
 const addinId = /<Id>([^<]+)<\/Id>/.exec(readFileSync(manifest, 'utf8'))[1];
 
 const WPS_NAME = 'epure';
-/** 旧名（VGD2 时期）登记过的条目，注册/注销时一并清理，避免出现两个选项卡 */
-const OLD_NAMES = ['vgd2'];
 const WPS_URL = 'http://127.0.0.1:3001/wps/';
 
 /* ---------- Word ---------- */
@@ -41,9 +39,8 @@ const dir = join(process.env.APPDATA ?? '', 'kingsoft', 'wps', 'jsaddons');
 const file = join(dir, 'publish.xml');
 let xml = existsSync(file) ? readFileSync(file, 'utf8') : '<?xml version="1.0" encoding="UTF-8"?>\n<jsplugins>\n</jsplugins>\n';
 // 去掉旧的同名条目（保留其他加载项）
-for (const n of [WPS_NAME, ...OLD_NAMES]) {
-  xml = xml.replace(new RegExp(`\\s*<jsplugin(?:online)?[^>]*name="${n}"[^>]*/>`, 'g'), '');
-}
+// 同时去掉安装包登记的本地条目（<jsplugin>），避免出现两个选项卡
+xml = xml.replace(new RegExp(`\\s*<jsplugin(?:online)?[^>]*name="${WPS_NAME}"[^>]*/>`, 'g'), '');
 if (!remove) {
   const entry = `  <jspluginonline name="${WPS_NAME}" type="wps" url="${WPS_URL}" debug="" enable="enable_dev" install="null"/>`;
   xml = xml.includes('</jsplugins>') ? xml.replace('</jsplugins>', `${entry}\n</jsplugins>`) : `<jsplugins>\n${entry}\n</jsplugins>\n`;

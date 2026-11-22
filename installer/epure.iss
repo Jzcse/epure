@@ -21,8 +21,6 @@
 
 #define AppName "Epure 示意图"
 #define AddinName "epure"
-; 旧名（VGD2 时期）：升级时清理其目录与登记条目
-#define LegacyName "vgd2"
 
 [Setup]
 AppId={{64EFCE6B-AA4F-401C-A799-36A1D105B40C}
@@ -34,7 +32,7 @@ VersionInfoVersion={#AppVersion}
 VersionInfoDescription={#AppName} WPS 加载项安装程序
 DefaultDirName={userappdata}\kingsoft\wps\jsaddons\{#AddinName}_{#AppVersion}
 DisableDirPage=yes
-; 安装目录随名称和版本变化；不沿用旧版（vgd2_*）安装目录，否则同 AppId 升级会装进旧名目录
+; 安装目录随版本变化（epure_<版本>），升级时不沿用上一次的目录
 UsePreviousAppDir=no
 DisableProgramGroupPage=yes
 DisableReadyPage=yes
@@ -60,8 +58,6 @@ chinesesimp.FinishedLabel=安装完成。%n%n打开 WPS 文字后，功能区会
 [InstallDelete]
 ; 升级：删除旧版本目录
 Type: filesandordirs; Name: "{userappdata}\kingsoft\wps\jsaddons\{#AddinName}_*"
-Type: filesandordirs; Name: "{userappdata}\kingsoft\wps\jsaddons\{#LegacyName}_*"
-Type: filesandordirs; Name: "{userappdata}\VGD2"
 
 [Files]
 Source: "{#AddinDir}\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
@@ -73,18 +69,10 @@ Filename: "{code:WpsExe}"; Description: "立即启动 WPS 文字"; Flags: postin
 const
   ENTRY_LOCAL = '<jsplugin name="{#AddinName}"';
   ENTRY_ONLINE = '<jspluginonline name="{#AddinName}"';
-  OLD_LOCAL = '<jsplugin name="{#LegacyName}"';
-  OLD_ONLINE = '<jspluginonline name="{#LegacyName}"';
 
 function PublishXml: String;
 begin
   Result := ExpandConstant('{userappdata}\kingsoft\wps\jsaddons\publish.xml');
-end;
-
-{ 2.0.0 测试版曾写入的位置，安装/卸载时一并清理 }
-function OldJsPluginsXml: String;
-begin
-  Result := ExpandConstant('{userappdata}\kingsoft\wps\jsaddons\jsplugins.xml');
 end;
 
 function ReadUtf8(const FileName: String): String;
@@ -128,16 +116,7 @@ end;
 { 去掉本加载项的本地与网址（开发版）条目，避免出现两个选项卡 }
 function RemoveEntry(S: String): String;
 begin
-  Result := RemoveTag(RemoveTag(RemoveTag(RemoveTag(S, ENTRY_LOCAL), ENTRY_ONLINE), OLD_LOCAL), OLD_ONLINE);
-end;
-
-procedure CleanOldJsPlugins;
-var
-  S: String;
-begin
-  if not FileExists(OldJsPluginsXml) then Exit;
-  S := ReadUtf8(OldJsPluginsXml);
-  if (Pos(ENTRY_LOCAL, S) > 0) or (Pos(OLD_LOCAL, S) > 0) then WriteUtf8(OldJsPluginsXml, RemoveTag(RemoveTag(S, ENTRY_LOCAL), OLD_LOCAL));
+  Result := RemoveTag(RemoveTag(S, ENTRY_LOCAL), ENTRY_ONLINE);
 end;
 
 procedure RegisterAddin;
@@ -147,7 +126,6 @@ var
 begin
   { url 仅在本地目录缺失时供 WPS 下载用；本地目录存在时 WPS 直接从本地加载 }
   Entry := '  ' + ENTRY_LOCAL + ' type="wps" url="http://127.0.0.1/{#AddinName}/{#AddinName}.7z" version="{#AppVersion}" enable="enable" install="null"/>' + #13#10;
-  CleanOldJsPlugins;
   S := RemoveEntry(ReadUtf8(PublishXml));
   P := Pos('</jsplugins>', S);
   if P > 0 then
@@ -161,10 +139,9 @@ procedure UnregisterAddin;
 var
   S: String;
 begin
-  CleanOldJsPlugins;
   if not FileExists(PublishXml) then Exit;
   S := ReadUtf8(PublishXml);
-  if (Pos(ENTRY_LOCAL, S) > 0) or (Pos(OLD_LOCAL, S) > 0) then WriteUtf8(PublishXml, RemoveTag(RemoveTag(S, ENTRY_LOCAL), OLD_LOCAL));
+  if Pos(ENTRY_LOCAL, S) > 0 then WriteUtf8(PublishXml, RemoveTag(S, ENTRY_LOCAL));
 end;
 
 function WpsInstallRoot: String;

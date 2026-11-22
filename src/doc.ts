@@ -6,19 +6,9 @@ import { b64ToBytes, bytesToB64 } from './util';
 const PREFIX_Z = 'EPUREz:';
 const PREFIX = 'EPURE:';
 
-/**
- * 旧名 VGD2 时期写入的标记。已插入文档的旧图、已保存的旧文件要继续可读，
- * 因此只读不写。不要删除。
- */
-const LEGACY: { prefix: string; compressed: boolean }[] = [
-  { prefix: 'VGD2z:', compressed: true },
-  { prefix: 'VGD2:', compressed: false },
-];
-
 const READABLE: { prefix: string; compressed: boolean }[] = [
   { prefix: PREFIX_Z, compressed: true },
   { prefix: PREFIX, compressed: false },
-  ...LEGACY,
 ];
 
 export function makeDoc(shapes: Shape[], size?: EpureDoc['size'], layers?: Layer[]): EpureDoc {
@@ -41,13 +31,9 @@ function validLayers(v: unknown): Layer[] | undefined {
   return out.length ? out : undefined;
 }
 
-/**
- * 校验并规范化任意来源的文档对象。
- * 兼容：format 为旧名 'vgd' 的文件；没有 layers 字段的旧文件（打开后归入默认图层）。
- */
+/** 校验并规范化任意来源的文档对象（layers 缺省时由编辑器使用默认图层） */
 export function parseDoc(obj: unknown): EpureDoc {
-  const format = (obj as { format?: unknown } | null)?.format;
-  if (!obj || typeof obj !== 'object' || (format !== 'epure' && format !== 'vgd')) {
+  if (!obj || typeof obj !== 'object' || (obj as { format?: unknown }).format !== 'epure') {
     throw new Error('不是有效的 Epure 文件');
   }
   const shapes = (obj as { shapes?: unknown }).shapes;
@@ -78,12 +64,12 @@ export async function encodeDoc(doc: EpureDoc): Promise<string> {
   return PREFIX + bytesToB64(raw);
 }
 
-/** 可选文字里是否含有本程序（含旧名 VGD2）写入的源数据 */
+/** 可选文字里是否含有本程序写入的源数据 */
 export function isEncodedDoc(str: string | null | undefined): boolean {
   return !!str && READABLE.some((r) => str.includes(r.prefix));
 }
 
-/** 解码可选文字；不含 Epure 数据时返回 null。可读取旧名 VGD2 写入的数据 */
+/** 解码可选文字；不含 Epure 数据时返回 null */
 export async function decodeDoc(str: string | null | undefined): Promise<EpureDoc | null> {
   if (!str) return null;
   const s = String(str).trim();
